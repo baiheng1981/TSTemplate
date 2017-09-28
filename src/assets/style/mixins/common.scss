@@ -1,0 +1,19 @@
+//公用类样式
+@import '../base/base';
+@import '../base/reset';
+@import '../base/utility';
+
+body{
+  background-color: #f2f2f2;
+  font-size:size(24);
+}
+
+[class^='icon-'] {
+  display: inline-block;
+  vertical-align: -.04rem;
+}
+
+
+[v-cloak] {
+  display: none !important;
+}

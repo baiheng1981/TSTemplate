@@ -1,0 +1,38 @@
+$body_width: 750px
+
+/*----------------------------------------------------------颜色值*/
+
+// 通用颜色值
+//浅蓝
+$color_lightBlue: rgb(76, 165, 254)
+//深蓝
+$color_deepBlue: RGB(50, 103, 204)
+$color_green: #33b833
+$color_violet: #7717a6
+
+// 通用背景颜色(透明度)
+//黑色
+@mixin black($n:1)
+  background: RGBA(0, 0, 0, $n)
+//深蓝
+@mixin deepBlue($n:1)
+  background: RGBA(50, 103, 204, $n)
+
+//基数 ==> px 和rem 之间转换的倍数
+$divisor_100: 100
+
+//通用字体
+$font_size_36: 36
+$font_size_32: 32
+$font_size_30: 30
+$font_size_28: 28
+$font_size_24: 24
+$font_size_18: 18
+$font_size_16: 16
+
+//函数指令
+@function size($n)  //调用  font-size:size(5)
+  @return ($n / $divisor_100) * 1rem
+
+
+

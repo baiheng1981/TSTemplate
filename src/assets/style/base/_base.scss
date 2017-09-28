@@ -1,0 +1,210 @@
+// 辅助 --》 常量
+// @import "../import/mixins.sass";
+
+/* 主体
+   ========================================================================== */
+
+
+/**
+ * 1. 主容器
+ * by. 刘玲 2016-11-24
+ */
+
+.hc-main {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    position: relative;
+}
+
+
+/* 主体 end
+   ========================================================================== */
+
+
+/* display
+   ========================================================================== */
+
+
+/**
+ * 1. 显示
+ * by. 刘玲 2016-11-24
+ */
+
+.hc-inline {
+    display: inline;
+}
+
+.hc-inline-block {
+    display: inline-block;
+}
+
+.hide {
+    display: none !important;
+}
+
+.show {
+    display: block !important;
+}
+
+.hc-box {
+    display: -webkit-box !important;
+    display: -moz-box !important;
+    display: -o-box !important;
+    display: box !important;
+}
+
+
+/* display end
+   ========================================================================== */
+
+
+/* float
+   ========================================================================== */
+
+
+/**
+ * 1. 浮动
+ * by. 刘玲 2016-11-24
+ */
+
+//浮动
+.hc-float-left {
+    float: left;
+}
+
+.hc-float-right {
+    float: right;
+}
+
+//清除浮动
+.clearfix {
+    zoom: 1;
+    _zoom: 1;
+}
+
+.clearfix::after {
+    clear: both;
+    content: ' ';
+    display: block;
+    width: 0;
+    height: 0;
+    visibility: hidden;
+}
+
+.overflow-x {
+    overflow: hidden;
+    overflow-x: hidden;
+}
+
+
+/* float end
+   ========================================================================== */
+
+
+/* text-align
+   ========================================================================== */
+
+
+/**
+ * 1. 水平对齐
+ * by. 刘玲 2016-11-24
+ */
+
+.hc-text-align-left {
+    text-align: left;
+}
+
+.hc-text-align-right {
+    text-align: right;
+}
+
+.hc-text-align-center {
+    text-align: center;
+}
+
+
+/* text-align end
+   ========================================================================== */
+
+
+/* text文本
+   ========================================================================== */
+
+
+/**
+ * 1. text文本
+ * by. 刘玲 2016-11-24
+ */
+
+//超出部分隐藏，并显示....
+.text-overflow {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+//强制换行
+.text-force-wrap {
+    word-break: break-all;
+    white-space: pre-wrap;
+}
+
+//强制不换行
+.text-not-wrap {
+    white-space: nowrap;
+}
+
+
+/* text文本 end
+   ========================================================================== */
+
+
+// /*
+//    !*1px-border-bottom*!
+// .border,
+// .border-radius{
+//     position: relative;
+// }
+// @media (-webkit-min-device-pixel-ratio: 2){
+//     .border{
+//         border: none;
+//         background-image: -webkit-linear-gradient(90deg,#e2e2e2,#fff 50%,transparent 50%);
+//         background-image: -moz-linear-gradient(90deg,#fff,#e2e2e2 50%,transparent 50%);
+//         background-image: -o-linear-gradient(90deg,#e2e2e2,#fff 50%,transparent 50%);
+//         background-image: linear-gradient(0,#fff,#e2e2e2 50%,transparent 50%);
+//         background-size: 100% 1px;
+//         background-repeat: no-repeat;
+//         background-position: bottom
+//     }
+// }*/
+
+.border,
+.border-radius{
+    position: relative;
+}
+@media (-webkit-min-device-pixel-ratio: 2){
+    .border{
+        border: none;
+        background-image: -webkit-linear-gradient(90deg,#e2e2e2,#fff 50%,transparent 50%);
+        background-image: -moz-linear-gradient(90deg,#fff,#e2e2e2 50%,transparent 50%);
+        background-image: -o-linear-gradient(90deg,#e2e2e2,#fff 50%,transparent 50%);
+        background-image: linear-gradient(0,#fff,#e2e2e2 50%,transparent 50%);
+        background-size: 100% 1px;
+        background-repeat: no-repeat;
+        background-position: bottom
+    }
+}
+
+.border-b {
+    border-bottom: 1px solid #e2e2e2
+}
+
+.border-t {
+    border-top: 1px solid #e2e2e2
+}
+
+.border-radius {
+    border: 1px solid #e2e2e2;
+    border-radius: 4px;
+}

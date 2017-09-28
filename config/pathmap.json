@@ -1,0 +1,11 @@
+{
+    "#":"# 相对目录以src目录为基准",
+
+    "lib": {
+        "vue$": "vue/dist/vue.js"
+    },
+    "pathHtml":"./*.html",
+    "pathJs":"./*.js",
+    "pathTs":"./*.ts",
+    "pathStatic":"./static"
+}

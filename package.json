@@ -1,0 +1,51 @@
+{
+  "name": "ts-template",
+  "version": "1.0.0",
+  "description": "ts base template",
+  "main": "index.js",
+  "dependencies": {
+    "babel-polyfill": "^6.26.0",
+    "parameter": "^2.2.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.1.1",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-stage-2": "^6.24.1",
+    "clean-webpack-plugin": "^0.1.16",
+    "copy-webpack-plugin": "^4.0.1",
+    "crypto": "^1.0.1",
+    "css-loader": "^0.28.4",
+    "expose-loader": "^0.7.3",
+    "extract-text-webpack-plugin": "^3.0.0",
+    "fastclick": "^1.0.6",
+    "file-loader": "^0.11.2",
+    "glob": "^7.1.2",
+    "html-loader": "^0.5.0",
+    "html-webpack-plugin": "^2.30.1",
+    "node-sass": "^4.5.3",
+    "optimize-css-assets-webpack-plugin": "^3.1.1",
+    "sass-loader": "^6.0.6",
+    "style-loader": "^0.18.2",
+    "ts-loader": "^2.3.2",
+    "tslint": "^5.7.0",
+    "typescript": "^2.5.2",
+    "url-loader": "^0.5.9",
+    "vue": "^2.4.2",
+    "vue-class-component": "^5.0.2",
+    "vue-loader": "^13.0.2",
+    "vue-router": "^2.7.0",
+    "vue-style-loader": "^3.0.1",
+    "vue-template-compiler": "^2.4.2",
+    "vue-ts-loader": "0.0.3",
+    "webpack": "^3.4.1"
+  },
+  "scripts": {
+    "dev": "SET NODE_ENV=development&& node build/webpack.config.js --dev 0",
+    "build": "SET NODE_ENV=production&& node build/webpack.config.js --dev 1",
+    "test": "SET NODE_ENV=test&& node build/webpack.config.js --dev 2"
+  },
+  "author": "baiheng",
+  "license": "ISC"
+}

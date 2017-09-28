@@ -1,0 +1,111 @@
+// 弹性盒子
+@mixin ik-box
+  display: -webkit-box
+  display: -moz-box
+  display: -o-box
+  display: box
+
+
+// 布局方式
+// horizontal(水平) | vertical(垂直)
+@mixin ik-box-orient($arg:horizontal)
+  -webkit-box-orient: $arg
+  -moz-box-orient: $arg
+  -o-box-orient: $arg
+  box-orient: $arg
+
+// 空间分配
+@mixin ik-box-flex($n:1)
+  -webkit-box-flex: $n
+  -moz-box-flex: $n
+  -o-box-flex: $n
+  box-flex: $n
+
+// 垂直方向上的空间利用
+// stretch(拉伸) | start | end | center
+@mixin ik-box-align($arg:stretch)
+  -webkit-box-align: $arg
+  -moz-box-align: $arg
+  -o-box-align: $arg
+  box-align: $arg
+
+// 水平方向上的空间利用
+// start | end | center | justify(两端对齐)
+@mixin ik-box-pack($arg:start)
+  -webkit-box-pack: $arg
+  -moz-box-pack: $arg
+  -o-box-pack: $arg
+  box-pack: $arg
+
+// 圆角
+@mixin border-radius($n)
+  -webkit-border-radius: $n
+  -moz-border-radius: $n
+  border-radius: $n
+
+// 垂直居中
+@mixin vertical-center($w, $h)
+  position: absolute
+  left: 0
+  right: 0
+  top: 0
+  bottom: 0
+  margin: auto
+  width: $w
+  height: $h
+
+// 图标生成
+@mixin ik-icon($u, $w, $h,$sw,$sh)
+  width: $w
+  height: $h
+  background: url($u) 0 0 no-repeat
+  background-size: $sw $sh
+
+//边框盒
+@mixin box-sizing
+  box-sizing: border-box
+  -moz-box-sizing: border-box /* Firefox */
+  -webkit-box-sizing: border-box /* Safari */
+
+//超出部分隐藏一行
+@mixin text-overflow
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
+
+//超出部分隐藏多行
+@mixin text-more-overflow($n:1)
+    display: -webkit-box
+    overflow: hidden
+    text-overflow: ellipsis
+    -webkit-box-orient: vertical
+    -webkit-line-clamp: $n
+//============================border1px解决==============================
+
+//   使用是父级加上positon:relative,
+//   并在@media screen and (-webkit-min-device-pixel-ratio: 2)下使用
+
+@mixin border-1($w,$h,$r,$c,$n,$bt,$br,$bb,$bl) //$w放大宽度,$h放大高度,$r圆角,$c颜色,$s缩小倍数,
+  &:before
+    content: ""
+    pointer-events: none /* 防止点击触发 */
+    box-sizing: border-box
+    position: absolute
+    width: $w
+    height: $h
+    left: 0
+    top: 0
+    border-radius: $r
+    border-top: $bt solid $c
+    border-bottom: $bb solid $c
+    border-left: $bl solid $c
+    border-right: $br solid $c
+    -webkit-transform(scale($n))
+    -webkit-transform-origin: 0 0
+    transform(scale($n))
+    transform-origin: 0 0
+
+//===============================================================
+
+@mixin size($num)
+  

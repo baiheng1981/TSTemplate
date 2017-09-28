@@ -1,0 +1,54 @@
+// 辅助 --》 变量
+
+@import "../import/vars.sass";
+
+
+/* font-size
+   ========================================================================== */
+
+/**
+ * 1. 字体
+ * by. 刘玲 2016-11-24
+ */
+
+.fs36{
+  font-size: ($font_size_36 / $divisor_100) * 1rem;
+}
+
+.fs32{
+  font-size: ($font_size_32 / $divisor_100) * 1rem;
+}
+
+.fs30{
+  font-size: ($font_size_30 / $divisor_100) * 1rem;
+}
+
+.fs28{
+  font-size: ($font_size_28 / $divisor_100) * 1rem;
+}
+
+.fs24{
+  font-size: ($font_size_24 / $divisor_100) * 1rem;
+}
+
+.fs16{
+  font-size: ($font_size_16 / $divisor_100) * 1rem;
+}
+
+/* font-size end
+   ========================================================================== */
+
+
+.color-808 {color: #808080;}
+.color-f45 {color: #f45169;}
+.color-333 {color: #333333;}
+.color-4b4 {color: #4b4b4b;}
+
+
+
+.mt10 { margin-top: size(10); }
+.mt20 { margin-top: size(20); }
+
+.mb20 { margin-bottom: size(20); }
+
+.ml10 { margin-left: size(10); }
