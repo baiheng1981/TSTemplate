@@ -21,7 +21,7 @@ console.log("run parameter:", minimist(process.argv).dev);
 /* 以 src 目录为基准 */
 var pathmap = require('./pathmap.json');
 console.log("pathmap:", pathmap)
-var getPathToSrc = function(_path){
+function getPathToSrc(_path){
     return path.resolve(PATH_src, _path);
 }
 
@@ -32,20 +32,38 @@ var out_bin = isDev ? PATH_bindev : PATH_bin;
 var out_chunkhash = isDev ? "" : ".[chunkhash]";
 var out_hash = isDev ? "" : ".[hash]";
 
-//entry
-var entries = function(){
-    var entryTSs = glob.sync(getPathToSrc(pathmap.pathTs));
-    var entryJSs = glob.sync(getPathToSrc(pathmap.pathJs));
-    var entryList = entryTSs.concat(entryJSs);
-    var map = {};
-    for(var i=0; i<entryList.length; i++){
-        var filePath = entryList[i];
-        // console.log(filePath)
-        var fileName = filePath.substring(filePath.lastIndexOf('\/')+1, filePath.lastIndexOf('.'));
-        map[fileName] = filePath;
+//html path 每个html对应1个同名入口文件(.ts)
+var htmlList = {};
+for(var i=0; i<pathmap.pathHtml.length; i++){
+    var _path = pathmap.pathHtml[i];
+    var _basename = path.basename(_path, '.html');
+    if(_basename=="*"){
+        var _childhtmllist = glob.sync(getPathToSrc(_path));
+        for( var j=0; j<_childhtmllist.length; j++){
+            var _childPath = _childhtmllist[j];
+            createHtmlPath(_childPath);
+        }
+    }else{
+        createHtmlPath(_path);
     }
-    return map;
 }
+function createHtmlPath(_path){
+    var htmlPath = getPathToSrc(_path);
+    var filePath = path.dirname(htmlPath);
+    var name = path.basename(htmlPath, '.html');
+    var htmlName = name+'.html';
+    var tsName = name+'.ts';
+    var tsPath = path.resolve(filePath,tsName);
+    htmlList[name] = {
+        filePath:filePath,
+        htmlName:htmlName,
+        htmlPath:htmlPath,
+        tsName:tsName,
+        tsPath:tsPath
+    };
+}
+
+console.log("entry:", htmlList)
 
 //pulgins
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -57,24 +75,20 @@ const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin');
 
 
 var plugins = [];
-
+var entries = {};
 var plugin_html = function(){
-    var ehtmllist = glob.sync(getPathToSrc(pathmap.pathHtml));
     var plus = [];
-    var entriesFiles = entries();
-    for(var i=0; i<ehtmllist.length; i++){
-        var filePath = ehtmllist[i];
-        var fileName = filePath.substring(filePath.lastIndexOf('\/')+1, filePath.lastIndexOf('.'));
+    for( var key in htmlList ){
+        var item = htmlList[key];
         var conf = {
-            template:filePath,
-            filename:fileName+'.html'
+            template:item.htmlPath,
+            filename:item.htmlName
         }
-        if(fileName in entriesFiles){
-            conf.inject = 'body';
-            conf.chunks = ["common", fileName];
-        }
-        // conf.favicon = getPathToSrc(pathmap.favicon);
+        conf.inject = 'body';
+        conf.chunks = ["common", item.tsName];
+        if(pathmap.favicon) conf.favicon = getPathToSrc(pathmap.favicon);
         plus.push(new HtmlWebpackPlugin(conf));
+        entries[item.tsName] = item.tsPath;
     }
     return plus;
 }
@@ -111,25 +125,8 @@ plugins.push(
             )
         }
     }),
-    //抽取css
-    // new ExtractTextPlugin("css/[name]"+out_chunkhash+".css"),
-    //复制目录/文件
-    new CopyWebpackPlugin([
-        {
-          from: getPathToSrc(pathmap.pathStatic),
-          to: path.resolve(out_bin, pathmap.pathStatic),
-          ignore: ['.*']
-        }
-    ])
+    new CleanWebpackPlugin(out_bin, PATH_root)
 );
-if(isDev==false) plugins.push(new OptimizeCSSPlugin({
-    cssProcessorOptions: {
-      safe: true,
-      discardComments: { //删除css注释
-        removeAll: true
-      }
-    }
-  }));
 
 //暴露的库
 // plugins.push(
@@ -140,7 +137,6 @@ if(isDev==false) plugins.push(new OptimizeCSSPlugin({
 //生产环境 清除/压缩
 if(isDev==false){
     plugins.unshift(
-        new CleanWebpackPlugin(out_bin, PATH_root),
         new webpack.optimize.UglifyJsPlugin({
             sourceMap: true,
             compress:{
@@ -150,14 +146,31 @@ if(isDev==false){
             }
         })
     );
+    plugins.push(new OptimizeCSSPlugin({
+        cssProcessorOptions: {
+          safe: true,
+          discardComments: { //删除css注释
+            removeAll: true
+          }
+        }
+    }));
+}
+//复制目录/文件
+if(pathmap.pathStatic) {
+    plugins.push(new CopyWebpackPlugin([
+        {
+        from: getPathToSrc(pathmap.pathStatic),
+        to: path.resolve(out_bin, pathmap.pathStatic),
+        ignore: ['.*']
+        }
+    ]))
 }
 
 
 
 
-
 var config = {
-    entry:Object.assign(entries(), {
+    entry:Object.assign(entries, {
 
     }),
     output:{
@@ -185,9 +198,15 @@ var config = {
             },
             {
                 test:/\.js$/,
-                exclude:[PATH_nodeMod],
+                // exclude:[PATH_nodeMod],
                 include: [PATH_src],
-                loader:"babel-loader"
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['latest','stage-2'],
+                        plugins: ['transform-runtime']
+                    }
+                }
             },
             {
                 test: /\.css$/,
@@ -232,7 +251,7 @@ var config = {
     },
     externals:{
 
-    },
+    }
 }
 // console.log("config:",JSON.stringify(config))
 // module.exports = config;

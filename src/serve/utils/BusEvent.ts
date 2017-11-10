@@ -1,53 +1,48 @@
 /*自定义事件*/
-enum BusEnentList {
+enum BusEventType {
     test = "test",
     loading = "Event_loading",
     bubble = "Event_bubble",
     alert = "Event_alert"
 }
 class BusEvent{
-    listenterData:object = {};
+    private listenerList:{[key: string]:Function[]} = {};
 
     constructor(){
 
     }
     addEvent(type:string, fn:Function):BusEvent{
-        if (typeof this.listenterData[type] === "undefined") {
-            this.listenterData[type] = [];
+        if (!this.listenerList[type]) {
+            let list:Function[] = [];
+            this.listenerList[type] = [];
         }
-        if (typeof fn === "function") {
-            this.listenterData[type].push(fn);
-        }
+        this.listenerList[type].push(fn);
         return this;
     }
-    triggerEvent(type:string, _arg:any):void {
-        var arrayEvent = this.listenterData[type];
-        if (arrayEvent instanceof Array) {
-            for (var i = 0; i < arrayEvent.length; i++) {
-                if (typeof arrayEvent[i] === "function") {
-                    arrayEvent[i].apply(this, [_arg]);
-                }
+    triggerEvent<T>(type:string, _arg?:T):void {
+        let _arrayEvent:Function[] = this.listenerList[type];
+        if(_arrayEvent){
+            for (let i = 0; i < _arrayEvent.length; i++) {
+                _arrayEvent[i](_arg);
             }
         }
     }
     removeEvent(type:string, fn?:Function):BusEvent {
-        var arrayEvent = this.listenterData[type];
-        if (typeof type == "string" && arrayEvent instanceof Array) {
-            if (typeof fn === "function") {
-                for (var i = arrayEvent.length - 1; i >= 0; i--) {
-                    if (arrayEvent[i] === fn) {
-                        this.listenterData[type].splice(i, 1);
-                        break;
-                    }
+        let _arrayEvent:Function[] = this.listenerList[type];
+        if (_arrayEvent && fn) {
+            for (let i = 0; i < _arrayEvent.length; i++) {
+                if (_arrayEvent[i] === fn) {
+                    this.listenerList[type].splice(i, 1);
+                    break;
                 }
-            } else {
-                delete this.listenterData[type];
             }
+        } else {
+            delete this.listenerList[type];
         }
         return this;
     }
     removeEvents():void {
-        for (let type in this.listenterData) {
+        for (let type in this.listenerList) {
             this.removeEvent(type);
         }
     }
@@ -57,5 +52,5 @@ class BusEvent{
 }
 
 
-export { BusEnentList }
+export { BusEvent, BusEventType }
 export default new BusEvent();

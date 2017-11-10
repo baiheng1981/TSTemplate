@@ -1,12 +1,58 @@
+/**
+ * API
+ * 根据 Parameter.ts 检查规则，添加 rule
+ */
 class API {
     "use strict";
 
-    apiOrders_get:string           = "/api/orders";              //我的订单
-    apiAftersales_get:string       = "/api/aftersales";          //我的订单售后
-    apiOrder_get:string            = "/api/order";               //订单详情
-    apiOrder_patch:string          = "/api/order";               //取消订单、确认收货
-    apiOrder_delete:string         = "/api/order";               //删除订单
+    /** 首页图片目录 */
+    homeConfig = {
+        api:"/static/home/config.txt", //接口
+        //接口匹配规则(Parameter.ts)
+        rule:{
+            urllist:{
+                type: 'array', itemType: 'string',
+            }
+        }
+    };
+
+
 
 }
 
 export default new API();
+
+/**
+ * rule example
+    let rule = {
+        name: 'string',
+        age: {type: 'int', max: 200},
+        gender: ['male', 'female'],
+        working: 'boolean',
+        salary: {type: 'number', min: 0},
+        birthday: 'date',
+        now: 'dateTime',
+        id: 'id',
+        childrens: {
+            type: 'array',
+            itemType: 'object',
+            required: false,
+            rule: {
+                name: 'string',
+                age: 'int',
+                gender: ['male', 'female'],
+                birthday: {type: 'date', required: false}
+            }
+        },
+        mate: {
+            type: 'object',
+            required: false,
+            rule: {
+                name: 'string',
+                age: 'int',
+                gender: ['male', 'female'],
+                birthday: {type: 'date', required: false}
+            }
+        }
+    };
+*/

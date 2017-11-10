@@ -1,11 +1,11 @@
 {
     "#":"# 相对目录以src目录为基准",
-
+    "favicon":"./static/favicon.ico",
+    "pathStatic": "./static",
     "lib": {
         "vue$": "vue/dist/vue.js"
     },
-    "pathHtml":"./*.html",
-    "pathJs":"./*.js",
-    "pathTs":"./*.ts",
-    "pathStatic":"./static"
+    "pathHtml":[
+        "./main/index.html"
+    ]
 }

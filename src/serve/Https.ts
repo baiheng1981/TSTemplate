@@ -1,43 +1,33 @@
-import axios, {CancelTokenSource} from 'axios'
-import Bus from './Bus'
-import MD5 from '../assets/utils/MD5'
-import AppInteractive from '../assets/utils/app_interactive/AppInteractive';
-import Data from './Data';
-import Qs from 'qs'
-import Utils from './utils/Utils';
+import Bus from './Bus';
+import {validate} from './utils/Parameter';
+import MD5 from './utils/MD5';
+import Utils from './Util';
+import Data from '../model/Data';
+import axios, {CancelTokenSource, AxiosInstance, AxiosRequestConfig} from 'axios';
+import Qs from 'qs';
 
 declare let process;
 
-enum XHTTPMethod {
-    patch   = "PATCH",
-    put     = "PUT",
-    delete  = "DELETE"
-}
 /**
  * @class Https
  *
  */
 class Https {
     headerConf = {
-        "app-version" :"1.0",
-        "cli-os" : "web",
-        "authorize-token": "",
-        "app-code" : (window as any).escape("CK"),
-        "app-platform": "ios"
+
     };
     config = {
         baseURL: '',
         timeout: 8000,
-        withCredentials: false,
-        cancelToken: null,
+        withCredentials: false
     };
 
     hostList = {
-        default:{
-            baseURL:"http://192.168.3.59:8084",
+        development:{
+            baseURL:"http://192.168.2.151:8013",
             signKey:"41a939289369cc56dcc80d8f0df66759"
         },
-        development:{
+        build_dev:{
             baseURL:"https://dev-eshop-api.haochang.tv",
             signKey:"41a939289369cc56dcc80d8f0df66759"
         },
@@ -49,6 +39,7 @@ class Https {
             baseURL:"https://dev-eshop-api.haochang.tv",
             signKey:"41a939289369cc56dcc80d8f0df66759"
         },
+
     }
 
 
@@ -67,8 +58,8 @@ class Https {
             this.config.baseURL = this.hostList[process.env.NODE_ENV].baseURL;
             this.signKey = this.hostList[process.env.NODE_ENV].signKey;
         }else{
-            this.config.baseURL = this.hostList.default.baseURL;
-            this.signKey = this.hostList.default.signKey;
+            this.config.baseURL = this.hostList.development.baseURL;
+            this.signKey = this.hostList.development.signKey;
         }
         this.timeoutLock = true;
         console.log("Https config:", this.config)
@@ -78,52 +69,43 @@ class Https {
      * @param _token token码
      */
     updateToken(_token:string):void {
-        Data.token = _token;
-        this.headerConf["authorize-token"] = _token;
-        let pf = Data.platform;
-        if(pf=="pc") pf = "android";
-        this.headerConf["app-platform"] = pf;
         this.initHttp();
         console.log("Https headerConf update:", this.headerConf)
     }
 
     /**
      * @method get      get方法
-     * @param _url      请求地址
+     * @param _request      请求地址/response rule
      * @param _updata   提交参数
      * @param _lock     默认 true 阻塞
      */
-    get(_url:string, _updata?:any, _lock?:boolean):any {
+    get(_request:object, _updata?:any, _lock?:boolean):Promise<{}> {
         _lock = _lock;
         if(_lock==undefined) _lock = true;
-
-        if(!AppInteractive.inApp()){
-            return this.getRequest(_url, _updata, _lock);
-        }else {
-            return new Promise((resolve, reject)=>{
-                AppInteractive.networkReachability((res)=>{
-                    if(res.errno==0){
-                        if(res.data.status!='notReach'){
-                            //联网
-                            resolve(this.getRequest(_url, _updata, _lock));
-                        }else {
-                            if(this.timeoutLock==true){
-                                Bus.$emit("showError");
-                            }else{
-                                Bus.$emit("Message", "暂无网络");
-                            }
-                            reject("notReach");
-                        }
-                    }else {
-                        reject(res)
-                    }
-                })
+        return new Promise((resolve, reject)=>{
+            this.getRequest(_request['api'], _updata, _lock).then((res)=>{
+                // console.log("get:",res)
+                let _data:object = res['data'];
+                if(_request['rule']){
+                    validate(_request['rule'], _data).then(()=>{
+                        // console.log("https get response validate success！")
+                        resolve(res);
+                    }).catch((err)=>{
+                        // console.log("https get fail:",err)
+                        Bus.$emit('bubble',err)
+                        reject(err);
+                    })
+                }else {
+                    resolve(res);
+                }
+            }).catch((err)=>{
+                reject(err);
             })
-        }
+        })
     }
-        getRequest(_url:string, _updata:any, _lock:boolean):any {
+        getRequest(_url:string, _updata:any, _lock:boolean):Promise<{}> {
             this.timeoutCreate();
-            let promise:any;
+            let promise:Promise<{}>;
             if(_updata){
                 promise = this.instance.get(_url, {params:this.formatData(_updata), lock:_lock});
             }else{
@@ -131,43 +113,86 @@ class Https {
             }
             return promise;
         }
+
     /**
      * @method post         post方法
-     * @param _url          请求地址
+     * @param _request          请求地址/response rule
      * @param _updata       提交数据
      * @param _lock         默认 true 阻塞
      */
-    post(_url:string, _updata?:any, _lock?:boolean):any {
-        return this.postT(_url, _updata, {lock:_lock});
+    post(_request:object, _updata?:any, _lock?:boolean):any {
+        return this.postT(_request, _updata, {lock:_lock});
     }
     /**
      * @method patch        patch方法
-     * @param _url          请求地址
+     * @param _request          请求地址/response rule
      * @param _updata       提交数据
      * @param _lock         默认 true 阻塞
      */
-    patch(_url:string, _updata?:any, _lock?:boolean):any {
-        return this.postT(_url, _updata, {MethodKey:"PATCH", lock:_lock});
+    patch(_request:object, _updata?:any, _lock?:boolean):any {
+        return this.postT(_request, _updata, {MethodKey:"PATCH", lock:_lock});
     }
     /**
      * @method put          put方法
-     * @param _url          请求地址
+     * @param _request          请求地址/response rule
      * @param _updata       提交数据
      * @param _lock         默认 true 阻塞
      */
-    put(_url:string, _updata?:any, _lock?:boolean):any {
-        return this.postT(_url, _updata, {MethodKey:"PUT", lock:_lock});
+    put(_request:object, _updata?:any, _lock?:boolean):any {
+        return this.postT(_request, _updata, {MethodKey:"PUT", lock:_lock});
     }
     /**
      * @method delete       delete方法
-     * @param _url          请求地址
+     * @param _request          请求地址/response rule
      * @param _updata       提交数据
      * @param _lock         默认 true 阻塞
      */
-    delete(_url:string, _updata?:any, _lock?:boolean):any {
-        return this.postT(_url, _updata, {MethodKey:"DELETE", lock:_lock});
+    delete(_request:object, _updata?:any, _lock?:boolean):any {
+        return this.postT(_request, _updata, {MethodKey:"DELETE", lock:_lock});
     }
-
+            /**
+             * @method postT        包装post方法
+             * @param _request          请求地址/response rule
+             * @param _updata       提交数据
+             * @param _param        自定义配置（ 预定义关键字:  lock -> true 阻塞 ）
+             *      {
+                        lock:false  //阻塞
+                    }
+            */
+            postT(_request:object, _updata?:any, _param?:any):Promise<{}> {
+                let param:any = _param || {};
+                if(param.lock==undefined) param.lock = true;
+                return new Promise((resolve, reject)=>{
+                    this.postTRequest(_request['api'], _updata, param).then((res)=>{
+                        let _data:object = res['data'];
+                        if(_request['rule']){
+                            validate(_request['rule'], _data).then(()=>{
+                                // console.log("https get response validate success！")
+                                resolve(res);
+                            }).catch((err)=>{
+                                // console.log("https get fail:",err)
+                                Bus.$emit('bubble',err)
+                                reject(err);
+                            })
+                        }else {
+                            resolve(res);
+                        }
+                    }).catch((err)=>{
+                        reject(err);
+                    })
+                })
+            }
+                postTRequest(_url:string, _updata:any, _param:any):Promise<{}> {
+                    this.timeoutCreate();
+                    let promise:Promise<{}>;
+                    _updata = _updata || {};
+                    if(_updata){
+                        promise = this.instance.post(_url, this.formatData(_updata), _param);
+                    }else{
+                        promise = this.instance.post(_url, {}, _param);
+                    }
+                    return promise;
+                };
 
 
     /**
@@ -194,7 +219,8 @@ class Https {
             }
             this.CSource = axios.CancelToken.source();
             req.cancelToken = this.CSource.token;
-            console.log("Https request:",req)
+            // console.log("Https request:",req)
+            // alert("Https request:"+JSON.stringify(req));
             return req;
         },(err) => {
             //请求失败关闭loding
@@ -205,6 +231,14 @@ class Https {
         })
         // 添加响应拦截器
         this.instance.interceptors.response.use((res) => {
+            // console.log("Https response:", res);
+            if(res.data.serverTime!=""){
+                Data.serverTime = res.data.serverTime*1000;
+                // console.log("Https response serverTime Sync success:",Data.serverTime);
+            }else {
+                console.log("Https response serverTime Sync fail!");
+            }
+
             this.timeoutClear();
             //请求成功关闭loding
             Bus.$emit('hideLoding', true);
@@ -274,54 +308,7 @@ class Https {
             }
         }
 
-    /**
-     * @method postT        包装post方法
-     * @param _url          请求地址
-     * @param _updata       提交数据
-     * @param _param        自定义配置（ 预定义关键字:  lock -> true 阻塞 ）
-     *      {
-                lock:false  //阻塞
-            }
-     */
-    postT(_url:string, _updata?:any, _param?:any):any {
-        let param:any = _param || {};
-        if(param.lock==undefined) param.lock = true;
 
-        if(!AppInteractive.inApp()){
-            return (this.postTRequest(_url, _updata, param));
-        }else {
-            return new Promise((resolve, reject)=>{
-                AppInteractive.networkReachability((res)=>{
-                    if(res.errno==0){
-                        if(res.data.status!='notReach'){
-                            //联网
-                            resolve(this.postTRequest(_url, _updata, param));
-                        }else {
-                            if(this.timeoutLock==true){
-                                Bus.$emit("showError");
-                            }else{
-                                Bus.$emit("Message", "暂无网络");
-                            }
-                            reject("notReach");
-                        }
-                    }else {
-                        reject(res);
-                    }
-                })
-            })
-        }
-    }
-        postTRequest(_url:string, _updata:any, _param:any):any {
-            this.timeoutCreate();
-            let promise:any;
-            _updata = _updata || {};
-            if(_updata){
-                promise = this.instance.post(_url, this.formatData(_updata), _param);
-            }else{
-                promise = this.instance.post(_url, {}, _param);
-            }
-            return promise;
-        };
 
     /**
      * @method formatData           计算后台接口所需签名
@@ -350,5 +337,4 @@ class Https {
 
 }
 
-export { XHTTPMethod };
 export default new Https();

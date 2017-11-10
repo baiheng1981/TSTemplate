@@ -1,0 +1,8 @@
+{
+    "urllist":[
+        "./static/home/bg1.png",
+        "./static/home/bg2.png",
+        "./static/home/bg3.png",
+        "./static/home/bg4.png"
+    ]
+}

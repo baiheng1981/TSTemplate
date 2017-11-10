@@ -1,0 +1,94 @@
+@import "../../../assets/style/mixins/util.scss"
+
+.recharge-result-main
+  width: 100%
+  padding-bottom: size(132)
+  .color-white
+    background-color: #fff
+  .success-info
+    margin-bottom: size(32)
+    .box
+      @include ik-box
+      @include ik-box-orient(vertical)
+      @include ik-box-align(center)
+      @include ik-box-pack(center)
+      padding-top: size(50)
+      padding-bottom: size(40)
+      .icon-success
+        width: size(120)
+        height: size(124)
+        background: url('../../../assets/images/icon/icon-success.png') 0 0 no-repeat
+        background-size: 100%
+        margin-top: size(20)
+        margin-bottom: size(10)
+      .fs60
+        font-size: size(60)
+      .success-p
+        color: #1ad45b
+      .error-p
+        color: #ff4a64
+      p:last-child
+        color: #333
+    .explain
+      padding: 0 size(20)
+      color: #a6a7a8
+    .explain:first-child
+      margin-bottom: size(10)
+    .state-box
+      @include ik-box
+      @include ik-box-align(center)
+      @include ik-box-pack(justify)
+      width: 100%
+      height: size(100)
+      margin-top: size(34)
+      padding: 0 size(20)
+      .text-box
+        @include ik-box
+        @include ik-box-align(center)
+        @include ik-box-pack
+      .icon-money
+        vertical-align: inherit
+        width: size(36)
+        height: size(36)
+        background: url('../../../assets/images/icon/icon-money.png') 0 0 no-repeat
+        background-size: 100%
+        margin-right: size(10)
+      .icon-arrow
+        width: size(15)
+        height: size(24)
+        background: url('../../../assets/images/icon/icon-arrow-right-small.png') 0 0 no-repeat
+        background-size: 100%
+      .text-span
+        display: block
+        //line-height: 1
+        color: #626364
+  button
+    width: 100%
+    border: none
+    color: #ff4a64
+    padding: size(30) 0
+    text-align: center
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

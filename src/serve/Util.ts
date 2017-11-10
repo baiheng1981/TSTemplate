@@ -17,22 +17,17 @@ class pagingInfo {
  * @class Utils 工具类
  */
 class Util {
-    //==============================reg验证
-    reg_url:RegExp = /^(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/;//url
-    reg_email:RegExp = /\w+[@]{1}\w+[.]\w+/;//email
-    reg_ip:RegExp = /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/;//ip
-    /**
-     * @method regTest 正则匹配判断
-     * @param {RegExp}  _reg    正则表达式
-     * @param {string}  _str    要匹配的str
-     */
-    regTest(_reg, _str:string):boolean{
-        if(_reg.test(_str)){
-            return true;
-        }else{
-            return false;
-        }
+    getDPR(){
+        let dpr = window.devicePixelRatio || 1;//获取屏幕像素比
+        return dpr;
     }
+    getRem(){
+        let clientW=document.documentElement.clientWidth || document.body.clientWidth;
+        let rem =clientW * this.getDPR() / 10;
+        return rem;
+    }
+
+
     /**
      * @method pagingCalculate 分页显示信息计算
      * @param {number}  _currpage         当前页码
@@ -179,7 +174,15 @@ class Util {
 
 
 
-
+    // 获取距今天dayCount天后的日期 "yy-mm-dd"
+    getDateAfter(dayCount:number) {
+        var dd = new Date();
+        dd.setDate(dd.getDate() + dayCount);
+        var y = dd.getFullYear();
+        var m = dd.getMonth() + 1;
+        var d = dd.getDate();
+        return y + "-" + m + "-" + d;
+    }
     /**
      * @method getDateByStr  "yy-mm-dd"转日期
      * @param _str "yy-mm-dd"
@@ -226,9 +229,12 @@ class Util {
     /**
      * @method IOSScrollEmpty  ios下vue-router返回某个滚动列表时出现空白，自动滚动可解决
      */
-    IOSScrollEmpty():void {
+    IOSScrollEmpty(_cb?:Function):void {
         window.scrollTo(0, 1);
         window.scrollTo(0, 0);
+        setTimeout(()=>{
+            if(_cb) _cb();
+        },300);
     }
 
 
